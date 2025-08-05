@@ -1,7 +1,7 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Hello world project',
+  title: 'Bhurrr_Vehicles',
   description: 'Your Vehicle\'s Silent Guardian — One Scan Away.',
 }
 

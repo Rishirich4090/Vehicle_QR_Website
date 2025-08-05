@@ -12,6 +12,14 @@ const Login = () => {
     lastName: '',
     resetEmail: ''
   });
+  const [loginError, setLoginError] = useState('');
+  // Dummy credentials for testing
+  const dummyUsers = [
+    { role: 'admin', email: 'admin@bhurrr.com', password: 'admin123' },
+    { role: 'user', email: 'user@bhurrr.com', password: 'user123' }
+  ];
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedUser, setLoggedUser] = useState(null);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -22,9 +30,41 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted:', { activeTab, formData });
+    if (activeTab === 'login') {
+      const found = dummyUsers.find(
+        (u) =>
+          (u.email === formData.email.trim() || u.email === formData.email.trim().toLowerCase()) &&
+          u.password === formData.password
+      );
+      if (found) {
+        setLoginError('');
+        setLoggedIn(true);
+        setLoggedUser(found);
+      } else {
+        setLoginError('Invalid email or password. Try admin@bhurrr.com/admin123 or user@bhurrr.com/user123');
+      }
+    } else {
+      // For signup/forgot, keep default
+      setLoginError('');
+      console.log('Form submitted:', { activeTab, formData });
+    }
   };
 
+  const handleLogout = () => {
+    setLoggedIn(false);
+    setLoggedUser(null);
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phone: '',
+      firstName: '',
+      lastName: '',
+      resetEmail: ''
+    });
+    setActiveTab('login');
+    setLoginError('');
+  };
   const Header = () => (
     <header className="w-full px-4 md:px-8 lg:px-28 py-6 flex justify-between items-center">
       <div className="flex items-center">
@@ -96,24 +136,23 @@ const Login = () => {
               </button>
             </div>
 
-            {activeTab === 'login' && (
+            {activeTab === 'login' && !loggedIn && (
               <div className="space-y-6">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
-                      Email or Phone
+                      Email
                     </label>
                     <input
                       type="text"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      placeholder="Enter your email or phone"
+                      placeholder="Enter your email"
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#DA0000] focus:outline-none text-sm"
                       required
                     />
                   </div>
-                  
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
                       Password
@@ -128,7 +167,9 @@ const Login = () => {
                       required
                     />
                   </div>
-
+                  {loginError && (
+                    <div className="text-red-600 text-sm font-medium">{loginError}</div>
+                  )}
                   <div className="flex items-center justify-between">
                     <label className="flex items-center">
                       <input type="checkbox" className="rounded border-gray-300 text-[#DA0000] focus:ring-[#DA0000]" />
@@ -142,15 +183,17 @@ const Login = () => {
                       Forgot password?
                     </button>
                   </div>
-
                   <button
                     type="submit"
                     className="w-full bg-[#ED3237] text-white py-3 rounded-xl text-base font-semibold hover:bg-[#DA0000] hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 transform"
                   >
                     Login
                   </button>
+                  <div className="mt-2 text-xs text-gray-500">
+                    <div>Test Admin: <b>admin@bhurrr.com</b> / <b>admin123</b></div>
+                    <div>Test User: <b>user@bhurrr.com</b> / <b>user123</b></div>
+                  </div>
                 </form>
-
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-200"></div>
@@ -159,7 +202,6 @@ const Login = () => {
                     <span className="px-4 bg-white text-gray-500">Or continue with</span>
                   </div>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
                   <button className="flex items-center justify-center px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300 transform">
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -177,6 +219,26 @@ const Login = () => {
                     <span className="ml-2 text-sm">Facebook</span>
                   </button>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'login' && loggedIn && (
+              <div className="space-y-6">
+                {loggedUser && loggedUser.role === 'admin' ? (
+                  <div className="bg-gray-50 rounded-xl p-6 text-center">
+                    <h2 className="text-2xl font-bold text-[#DA0000] mb-2">Admin Profile</h2>
+                    <div className="text-gray-700 mb-2">Email: <b>{loggedUser.email}</b></div>
+                    <div className="text-gray-700 mb-2">Role: <b>Admin</b></div>
+                    <button onClick={handleLogout} className="mt-4 px-6 py-2 bg-[#ED3237] text-white rounded-lg font-semibold hover:bg-[#DA0000] transition-all">Logout</button>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 rounded-xl p-6 text-center">
+                    <h2 className="text-2xl font-bold text-[#DA0000] mb-2">User Profile</h2>
+                    <div className="text-gray-700 mb-2">Email: <b>{loggedUser.email}</b></div>
+                    <div className="text-gray-700 mb-2">Role: <b>User</b></div>
+                    <button onClick={handleLogout} className="mt-4 px-6 py-2 bg-[#ED3237] text-white rounded-lg font-semibold hover:bg-[#DA0000] transition-all">Logout</button>
+                  </div>
+                )}
               </div>
             )}
 
