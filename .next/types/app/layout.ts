@@ -1,4 +1,4 @@
-// File: C:\Users\Rajri.000\Downloads\pulse-sanctuary (1)\app\layout.js
+// File: D:\Web_Project\QR_scan_vehicle\qr-vehicle-js\app\layout.js
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
